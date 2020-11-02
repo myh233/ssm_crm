@@ -1,0 +1,18 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.igeek.mapper.UserMapper">
+
+	<!-- 开启二级缓存的使用 :必须配置-->
+	<cache type="com.igeek.cache.RedisCache"
+		   eviction="LRU"
+		   flushInterval="6000000"
+		   size="1024"
+		   readOnly="false"/>
+
+	<select id="findById" useCache="true" parameterType="String" resultType="user">
+		select * from user where uid=#{value}
+	</select>
+
+</mapper>

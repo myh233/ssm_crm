@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--mybatis核心配置文件的根标签-->
+<configuration>
+    <!--配置全局的参数：开启缓存，延迟加载，日志实现等等-->
+    <!-- <settings>
+        <setting name="logImpl" value="LOG4J"/>
+        二级缓存：开启二级缓存
+        <setting name="cacheEnabled" value="true"/>
+    </settings> -->
+    
+    <typeAliases>
+        <!--<typeAlias type="com.igeek.bean.User" alias="user"/>-->
+        <!--配置起别名的类所在的包，自动扫描包下的所有类，自动设置别名-->
+        <package name="com.igeek.bean"/>
+    </typeAliases>
+
+
+</configuration>

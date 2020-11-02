@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx.xsd
+    ">
+	
+	<!-- 引入Redis缓存配置文件 -->
+	<import resource="applicationContext-mybatis.xml" />
+	<import resource="applicationContext-redis.xml" />
+
+	<!-- 开启扫描 -->
+	<context:component-scan base-package="com.igeek" />
+
+	<!--引入外部的properties文件的标签 -->
+	<context:property-placeholder
+		location="classpath:dbconfig.properties" />
+	<!--spring管理数据源 -->
+	<bean id="dataSource"
+		class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="url" value="${jdbc.url}" />
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+
+		<property name="initialSize" value="10" />
+		<property name="minIdle" value="5" />
+		<property name="maxActive" value="30" />
+
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+	</bean>
+
+	<!--配置sqlSessionFactory:交由spring管理 -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!--注入一个数据源 -->
+		<property name="dataSource" ref="dataSource" />
+		<!--如果需要保留mybatis自己的核心配置文件，则需要配置configLocation参数，如果不保留，则需要将mybatis中的配置放在该处 -->
+		<property name="configLocation"
+			value="classpath:sqlMapConfig.xml" />
+	</bean>
+
+	<!--配置mybatis映射文件的扫描包 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!--注入一个sqlSessionFactory -->
+		<property name="sqlSessionFactoryBeanName"
+			value="sqlSessionFactory" />
+		<!--指定扫描的包名 -->
+		<property name="basePackage" value="com.igeek.mapper" />
+	</bean>
+
+
+	<!--mybatis的事务也是交给spring管理：配置声明式事务 -->
+	<!--声明式事务以xml的配置方式 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<!--定义事务的特性：隔离级别，传播特性 -->
+	<tx:advice id="txAdvice"
+		transaction-manager="transactionManager">
+		<tx:attributes>
+			<!--为每一个方法配置自己的事务特性 -->
+			<tx:method name="modify*" isolation="DEFAULT"
+				propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="save*" isolation="REPEATABLE_READ"
+				propagation="REQUIRED" />
+			<tx:method name="remove*" isolation="REPEATABLE_READ"
+				propagation="REQUIRED" />
+			<tx:method name="query*" propagation="SUPPORTS"
+				read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!--将事务拦在哪个层面 -->
+	<aop:config>
+		<aop:pointcut id="txpointcut"
+			expression="execution(* com.igeek.service..*.*(..))" />
+		<aop:advisor advice-ref="txAdvice"
+			pointcut-ref="txpointcut" />
+	</aop:config>
+
+
+	<!--注解方式【配置事务：开启注解 -->
+	<!--<tx:annotation-driven transaction-manager="transactionManager"/> -->
+
+</beans>

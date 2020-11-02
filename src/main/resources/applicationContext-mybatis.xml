@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        ">
+        
+       <context:property-placeholder ignore-unresolvable="true" location="classpath:dbconfig.properties"/>
+       
+        <!-- 开启注解扫描功能
+      base-package:该包及子包下的所有类都会被扫描到
+       -->  
+      <context:component-scan base-package="com.igeek"/>  
+
+    <!-- 1.数据源的配置，只能通过xml -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="maxActive" value="30"/>
+		<property name="initialSize" value="10"/>
+		<property name="maxWait" value="60000"/>
+		<property name="minIdle" value="5"/>
+	</bean>
+      
+    <!-- 2.配置sqlSessionFactory单例的对象 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    	<!-- 设置Mybatis核心配置文件的位置 -->
+    	<!--<property name="configLocation" value="classpath:SqlMapConfig.xml"/>-->
+
+		<property name="configurationProperties">
+			<props>
+				<!-- 全局映射器启用缓存 *主要将此属性设置完成即可-->
+				<prop key="cacheEnabled">true</prop>
+				<!-- 查询时，关闭关联对象即时加载以提高性能 -->
+				<prop key="lazyLoadingEnabled">false</prop>
+				<!-- 设置关联对象加载的形态，此处为按需加载字段(加载字段由SQL指 定)，不会加载关联表的所有字段，以提高性能 -->
+				<prop key="aggressiveLazyLoading">true</prop>
+			</props>
+		</property>
+		<property name="typeAliasesPackage" value="com.igeek.bean"/>
+    	<!-- 设置数据源属性 -->
+    	<property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    
+    <!-- 第二种配置方式：只需要配置接口的包 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    	<property name="basePackage" value="com.igeek.mapper"/>
+    </bean>
+
+</beans>

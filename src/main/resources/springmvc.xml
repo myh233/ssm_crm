@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/mvc   http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!--使用注解：开启注解扫描包 -->
+	<context:component-scan
+		base-package="com.igeek.controller" />
+
+	<!-- 开启注解驱动 -->
+	<mvc:annotation-driven />
+
+	<!-- 开启默认servlet处理器 -->
+	<mvc:default-servlet-handler />
+
+	<!--配置异常的处理器 -->
+	<!-- <bean class="com.igeek.exceptionhandler.MyExceptionHandler" /> -->
+
+	<!--配置文件上传的组件:必须定义：id="multipartResolver" -->
+	<!-- <bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" /> -->
+
+	<!-- 配置静态文件映射路径 -->
+	<!-- <mvc:resources location="file:///E:/images/"
+		mapping="/images/**"></mvc:resources> -->
+
+	<!--配置拦截器 -->
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/user/**" />
+			<mvc:mapping path="/product/**" />
+			<mvc:mapping path="/rest/**" />
+			排除映射路径
+			<mvc:exclude-mapping path="/user/login" />
+			<bean class="com.igeek.interceptor.PowerInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors> -->
+
+</beans>
